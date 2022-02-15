@@ -8,8 +8,8 @@ from basic_block import form_basic_blocks
 TERMINATORS = ['jmp', 'ret', 'br']
 
 class BasicBlock(object):
-    def __init__(self, blocks):
-        self.blocks = blocks
+    def __init__(self, block):
+        self.instrs = block
         self.pred = []
         self.succ = []
 
@@ -18,7 +18,7 @@ class CFG(object):
     Give each block succ and pred 
     """
     def __init__(self, blocks, reverse=False):
-        self.instrs = blocks
+        self.blocks = blocks
         self.cfg = dict()
         self.reverse = reverse
         self.build_cfg()
@@ -47,7 +47,7 @@ class CFG(object):
                 br_targets = bb.instrs[-1]['labels']
                 for target in br_targets:
                     self.cfg[label].succ.append(target)
-                    self.cfg[target].predeccessors.append(label)
+                    self.cfg[target].pred.append(label)
 
 def remove_from_set(in_set, dest):
     out_set = set()
@@ -92,7 +92,7 @@ def worklist(cfg):
     # initialize
     ins = dict()
     outs = dict()
-    for label, _ in cfg:
+    for label, _ in cfg.items():
         ins[label] = set()
         outs[label] = set()
     worklist = copy.deepcopy(cfg)
@@ -107,8 +107,9 @@ def worklist(cfg):
         bb_outs  = transfer(bb, bb_ins_merged)
         if len(bb_outs) != outs[label]:
             outs[label] = bb_outs
-            
-
+            for succ in bb.succ:
+                worklist[succ] = cfg[succ]
+    print(outs)
 
 def main():
     # read from file because it's easier to debug this way

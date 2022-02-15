@@ -73,8 +73,8 @@ def worklist(cfg):
     def transfer(bb, ins):
         """ Transfer function for live variables: DEF U (IN - KILL)
         - bb: BasicBlock
-        - ins: a set of instr
-        - return: a set of instr
+        - ins: a set of str
+        - return: a set of str
         """
         defs = set()
         alive_vars = [i['dest'] for i in ins if 'dest' in i] 
@@ -83,9 +83,10 @@ def worklist(cfg):
             if instr['dest'] in alive_vars:
                 # we just killed a variable
                 # removed it from ins
-                ins = remove_from_set(ins, instr['dest'])
+                # ins = remove_from_set(ins, instr['dest'])
+                ins.remove(instr['dest'])
             else: # we add a new definition
-                defs.add(instr)
+                defs.add(instr['dest'])
         return defs.union(ins)
 
     # ins and outs are dicts: {str : set()}

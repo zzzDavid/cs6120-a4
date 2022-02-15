@@ -1,5 +1,6 @@
 from distutils.command.build_clib import build_clib
 import json
+import copy
 import sys
 
 from basic_block import form_basic_blocks
@@ -48,10 +49,66 @@ class CFG(object):
                     self.cfg[label].succ.append(target)
                     self.cfg[target].predeccessors.append(label)
 
+def remove_from_set(in_set, dest):
+    out_set = set()
+    for i in in_set:
+        if 'dest' not in i: continue
+        if dest != i['dest']: out_set.add(i)
+    return out_set
+
 def worklist(cfg):
     """The worklist algorithm
+    - cfg: a dictionary of blocks
     """
+    def merge(ins):
+        """
+        - ins: a list of sets
+        - return: a set
+        """
+        res = set()
+        for i in ins:
+            res.union(i)
+        return res
+
+    def transfer(bb, ins):
+        """ Transfer function for live variables: DEF U (IN - KILL)
+        - bb: BasicBlock
+        - ins: a set of instr
+        - return: a set of instr
+        """
+        defs = set()
+        alive_vars = [i['dest'] for i in ins if 'dest' in i] 
+        for instr in bb.instrs:
+            if 'dest' not in instr: continue
+            if instr['dest'] in alive_vars:
+                # we just killed a variable
+                # removed it from ins
+                ins = remove_from_set(ins, instr['dest'])
+            else: # we add a new definition
+                defs.add(instr)
+        return defs.union(ins)
+
+    # ins and outs are dicts: {str : set()}
+    # initialize
+    ins = dict()
+    outs = dict()
+    for label, _ in cfg:
+        ins[label] = set()
+        outs[label] = set()
+    worklist = copy.deepcopy(cfg)
+    while len(worklist) > 0:
+        # pick any block from worklist
+        # I'll just pick the first one
+        label = list(worklist.keys())[0]
+        bb = worklist[label]
+        bb_ins = [ins[label] for label in bb.pred]
+        bb_ins_merged = merge(bb_ins)
+        ins[label] = bb_ins_merged
+        bb_outs  = transfer(bb, bb_ins_merged)
+        if len(bb_outs) != outs[label]:
+            outs[label] = bb_outs
             
+
 
 def main():
     # read from file because it's easier to debug this way
@@ -62,7 +119,8 @@ def main():
     for func in prog['functions']:
         blocks = form_basic_blocks(func['instrs'])
         blocks = [b for b in blocks if len(b) > 0]
-        cfg = CFG(blocks)
+        cfg = CFG(blocks).cfg
+        worklist(cfg)
 
 if __name__ == "__main__":
     main()

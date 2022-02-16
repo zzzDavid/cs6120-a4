@@ -5,8 +5,9 @@ import sys
 from basic_block import form_basic_blocks
 from control_flow_graph import *
 from merge_transfer_funcs import *
+from printer import *
 
-def worklist(cfg, merge_func, transfer_func):
+def worklist(cfg, merge_func, transfer_func, printer):
     """The worklist algorithm
     - cfg: a dictionary of blocks
     """
@@ -31,8 +32,10 @@ def worklist(cfg, merge_func, transfer_func):
             outs[label] = bb_outs
             for succ in bb.succ:
                 worklist[succ] = cfg[succ]
-    print(ins)
-    print(outs)
+    # print(ins)
+    # print(outs)
+    printer(ins, outs)
+    
 
 def main():
     # read from file because it's easier to debug this way
@@ -46,7 +49,8 @@ def main():
         # cfg = CFG(blocks).cfg
         # worklist(cfg, merge_reaching, transfer_reaching)
         cfg = CFG(blocks, reverse=True).cfg
-        worklist(cfg, merge_live, transfer_live)
+        printer = Printer(reverse=True)
+        worklist(cfg, merge_live, transfer_live, printer)
 
 if __name__ == "__main__":
     main()

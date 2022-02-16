@@ -28,12 +28,10 @@ def worklist(cfg, merge_func, transfer_func, printer):
         bb_ins_merged = merge_func(bb_ins)
         ins[label] = bb_ins_merged
         bb_outs  = transfer_func(bb, bb_ins_merged)
-        if len(bb_outs) != outs[label]:
+        if len(bb_outs) != len(outs[label]):
             outs[label] = bb_outs
             for succ in bb.succ:
                 worklist[succ] = cfg[succ]
-    # print(ins)
-    # print(outs)
     printer(ins, outs)
     
 

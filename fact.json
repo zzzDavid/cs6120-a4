@@ -3,6 +3,9 @@
     {
       "instrs": [
         {
+          "label": "start"
+        },
+        {
           "dest": "result",
           "op": "const",
           "type": "int",
@@ -13,6 +16,12 @@
           "op": "const",
           "type": "int",
           "value": 8
+        },
+        {
+          "labels": [
+            "header"
+          ],
+          "op": "jmp"
         },
         {
           "label": "header"

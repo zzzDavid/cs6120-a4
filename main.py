@@ -4,40 +4,12 @@ import sys
 
 from basic_block import form_basic_blocks
 from control_flow_graph import *
+from merge_transfer_funcs import *
 
-def worklist(cfg):
+def worklist(cfg, merge_func, transfer_func):
     """The worklist algorithm
     - cfg: a dictionary of blocks
     """
-    def merge(ins):
-        """
-        - ins: a list of sets
-        - return: a set
-        """
-        res = set()
-        for i in ins:
-            res = res.union(i)
-        return res
-
-    def transfer(bb, ins):
-        """ Transfer function for live variables: DEF U (IN - KILL)
-        - bb: BasicBlock
-        - ins: a set of str
-        - return: a set of str
-        """
-        defs = set()
-        alive_vars = [i['dest'] for i in ins if 'dest' in i] 
-        for instr in bb.instrs:
-            if 'dest' not in instr: continue
-            if instr['dest'] in alive_vars:
-                # we just killed a variable
-                # removed it from ins
-                # ins = remove_from_set(ins, instr['dest'])
-                ins.remove(instr['dest'])
-            else: # we add a new definition
-                defs.add(instr['dest'])
-        return defs.union(ins)
-
     # ins and outs are dicts: {str : set()}
     # initialize
     ins = dict()
@@ -52,9 +24,9 @@ def worklist(cfg):
         label = list(worklist.keys())[0]
         bb = worklist.pop(label)
         bb_ins = [outs[label] for label in bb.pred]
-        bb_ins_merged = merge(bb_ins)
+        bb_ins_merged = merge_func(bb_ins)
         ins[label] = bb_ins_merged
-        bb_outs  = transfer(bb, bb_ins_merged)
+        bb_outs  = transfer_func(bb, bb_ins_merged)
         if len(bb_outs) != outs[label]:
             outs[label] = bb_outs
             for succ in bb.succ:
@@ -72,7 +44,7 @@ def main():
         blocks = form_basic_blocks(func['instrs'])
         blocks = [b for b in blocks if len(b) > 0]
         cfg = CFG(blocks).cfg
-        worklist(cfg)
+        worklist(cfg, merge_reaching, transfer_reaching)
 
 if __name__ == "__main__":
     main()

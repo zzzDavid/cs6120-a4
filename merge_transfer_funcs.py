@@ -52,7 +52,4 @@ def transfer_live(bb, ins):
         if 'args' in instr:
             for arg in instr['args']:
                 alive.add(arg)
-        # if 'labels' in instr:
-        #     for arg in instr['labels']:
-        #         alive.add(arg)
     return alive

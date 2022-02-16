@@ -29,6 +29,39 @@ def transfer_reaching(bb, ins):
             defs.add(instr['dest'])
     return defs.union(reaching_vars)
 
+# Constant Propagation
+def merge_lvn(ins):
+    """
+    - ins: a list of sets
+    - return: a set
+    """
+    res = set()
+    for i in ins:
+        res = res.union(i)
+    return res
+
+def transfer_lvn(bb, ins):
+    """
+    - bb: BasicBlock
+    - ins: a set of value tuple
+    - return: a set of value tuple
+    """
+    """
+    My idea of implementing constant propagation
+    and other lvn-related stuff is to generate
+    value tuples at the input of each basic block
+    """
+    res = copy.deepcopy(ins)
+    for instr in bb.instrs:
+        # skip the labels
+        if 'dest' not in instr: continue
+        if 'op' not in instr: continue
+        # Build value tuple
+        if 'args' in instr:
+            value_tuple = (instr['dest'], instr['op'], *instr['args'])
+        else: # const instr
+            value_tuple = (instr['op'], instr['value'])
+    
 
 # Live variables
 def merge_live(ins):

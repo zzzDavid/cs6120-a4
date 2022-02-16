@@ -42,15 +42,17 @@ def transfer_live(bb, ins):
     reversed_instrs = copy.deepcopy(bb.instrs)
     reversed_instrs.reverse()
     for instr in reversed_instrs:
-        if 'dest' not in instr: continue
-        if instr['dest'] in ins:
+        if 'dest' in instr and instr['dest'] in alive:
             # we just found a necessary variable
             # that is defined here
             # so we remove it from alive_vars
             # we just killed a variable
             alive.remove(instr['dest'])
-        if 'args' not in instr: continue
         # the args needs to be added to "alive_vars"
-        for arg in instr['args']:
-            alive.add(arg)
+        if 'args' in instr:
+            for arg in instr['args']:
+                alive.add(arg)
+        # if 'labels' in instr:
+        #     for arg in instr['labels']:
+        #         alive.add(arg)
     return alive

@@ -67,7 +67,7 @@ def worklist(cfg):
         """
         res = set()
         for i in ins:
-            res.union(i)
+            res = res.union(i)
         return res
 
     def transfer(bb, ins):
@@ -102,7 +102,7 @@ def worklist(cfg):
         # I'll just pick the first one
         label = list(worklist.keys())[0]
         bb = worklist.pop(label)
-        bb_ins = [ins[label] for label in bb.pred]
+        bb_ins = [outs[label] for label in bb.pred]
         bb_ins_merged = merge(bb_ins)
         ins[label] = bb_ins_merged
         bb_outs  = transfer(bb, bb_ins_merged)
@@ -110,7 +110,9 @@ def worklist(cfg):
             outs[label] = bb_outs
             for succ in bb.succ:
                 worklist[succ] = cfg[succ]
+    print(ins)
     print(outs)
+    return outs 
 
 def main():
     # read from file because it's easier to debug this way

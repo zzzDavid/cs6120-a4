@@ -101,7 +101,7 @@ def worklist(cfg):
         # pick any block from worklist
         # I'll just pick the first one
         label = list(worklist.keys())[0]
-        bb = worklist[label]
+        bb = worklist.pop(label)
         bb_ins = [ins[label] for label in bb.pred]
         bb_ins_merged = merge(bb_ins)
         ins[label] = bb_ins_merged

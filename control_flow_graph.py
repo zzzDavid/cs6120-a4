@@ -34,10 +34,18 @@ class CFG(object):
             if op not in TERMINATORS: continue
             if op == "jmp":
                 jmp_target = bb.instrs[-1]['labels'][0]
-                self.cfg[label].succ.append(jmp_target)
-                self.cfg[jmp_target].pred.append(label)
+                if self.reverse:
+                    self.cfg[label].pred.append(jmp_target)
+                    self.cfg[jmp_target].succ.append(label)
+                else:
+                    self.cfg[label].succ.append(jmp_target)
+                    self.cfg[jmp_target].pred.append(label)
             elif op == "br":
                 br_targets = bb.instrs[-1]['labels']
                 for target in br_targets:
-                    self.cfg[label].succ.append(target)
-                    self.cfg[target].pred.append(label)
+                    if self.reverse:
+                        self.cfg[label].pred.append(target)
+                        self.cfg[target].succ.append(label)
+                    else:
+                        self.cfg[label].succ.append(target)
+                        self.cfg[target].pred.append(label)

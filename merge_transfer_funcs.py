@@ -39,7 +39,9 @@ def merge_live(ins):
 
 def transfer_live(bb, ins):
     alive = copy.deepcopy(ins)
-    for instr in bb.instrs.reverse():
+    reversed_instrs = copy.deepcopy(bb.instrs)
+    reversed_instrs.reverse()
+    for instr in reversed_instrs:
         if 'dest' not in instr: continue
         if instr['dest'] in ins:
             # we just found a necessary variable

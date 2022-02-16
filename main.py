@@ -43,8 +43,10 @@ def main():
     for func in prog['functions']:
         blocks = form_basic_blocks(func['instrs'])
         blocks = [b for b in blocks if len(b) > 0]
-        cfg = CFG(blocks).cfg
-        worklist(cfg, merge_reaching, transfer_reaching)
+        # cfg = CFG(blocks).cfg
+        # worklist(cfg, merge_reaching, transfer_reaching)
+        cfg = CFG(blocks, reverse=True).cfg
+        worklist(cfg, merge_live, transfer_live)
 
 if __name__ == "__main__":
     main()

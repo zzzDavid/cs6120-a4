@@ -1,3 +1,6 @@
+import copy 
+# Reaching Definitions
+
 def merge_reaching(ins):
     """
     - ins: a list of sets
@@ -15,14 +18,37 @@ def transfer_reaching(bb, ins):
     - return: a set of str
     """
     defs = set()
-    alive_vars = [i['dest'] for i in ins if 'dest' in i] 
+    reaching_vars = copy.deepcopy(ins)
     for instr in bb.instrs:
         if 'dest' not in instr: continue
-        if instr['dest'] in alive_vars:
+        if instr['dest'] in ins:
             # we just killed a variable
             # removed it from ins
-            # ins = remove_from_set(ins, instr['dest'])
-            ins.remove(instr['dest'])
+            reaching_vars.remove(instr['dest'])
         else: # we add a new definition
             defs.add(instr['dest'])
-    return defs.union(ins)
+    return defs.union(reaching_vars)
+
+
+# Live variables
+def merge_live(ins):
+    res = set()
+    for i in ins:
+        res = res.union(i)
+    return res
+
+def transfer_live(bb, ins):
+    alive = copy.deepcopy(ins)
+    for instr in bb.instrs.reverse():
+        if 'dest' not in instr: continue
+        if instr['dest'] in ins:
+            # we just found a necessary variable
+            # that is defined here
+            # so we remove it from alive_vars
+            # we just killed a variable
+            alive.remove(instr['dest'])
+        if 'args' not in instr: continue
+        # the args needs to be added to "alive_vars"
+        for arg in instr['args']:
+            alive.add(arg)
+    return alive

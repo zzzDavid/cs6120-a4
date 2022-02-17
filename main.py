@@ -33,6 +33,7 @@ def worklist(cfg, merge_func, transfer_func, printer):
             for succ in bb.succ:
                 worklist[succ] = cfg[succ]
     printer(ins, outs)
+    import ipdb; ipdb.set_trace()
     
 
 def main():
@@ -46,9 +47,9 @@ def main():
         blocks = [b for b in blocks if len(b) > 0]
         # cfg = CFG(blocks).cfg
         # worklist(cfg, merge_reaching, transfer_reaching)
-        cfg = CFG(blocks, reverse=True).cfg
-        printer = Printer(reverse=True)
-        worklist(cfg, merge_live, transfer_live, printer)
+        cfg = CFG(blocks, reverse=False).cfg
+        printer = Printer(reverse=False)
+        worklist(cfg, merge_lvn, transfer_lvn, printer)
 
 if __name__ == "__main__":
     main()

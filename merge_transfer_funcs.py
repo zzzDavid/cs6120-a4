@@ -1,4 +1,7 @@
-import copy 
+import copy
+
+from tomlkit import value 
+from lvn import *
 # Reaching Definitions
 
 def merge_reaching(ins):
@@ -51,8 +54,10 @@ def transfer_lvn(bb, ins):
     and other lvn-related stuff is to generate
     value tuples at the input of each basic block
     """
+    # Do const folding, const propagation
+    instrs = lvn(bb.instrs, ins)
     res = copy.deepcopy(ins)
-    for instr in bb.instrs:
+    for instr in instrs:
         # skip the labels
         if 'dest' not in instr: continue
         if 'op' not in instr: continue
@@ -61,7 +66,10 @@ def transfer_lvn(bb, ins):
             value_tuple = (instr['dest'], instr['op'], *instr['args'])
         else: # const instr
             value_tuple = (instr['dest'], instr['op'], instr['value'])
-    
+        res.add(value_tuple)
+    # replace basic block's old instructions with optimized ones
+    bb.instrs = instrs
+    return res
 
 # Live variables
 def merge_live(ins):

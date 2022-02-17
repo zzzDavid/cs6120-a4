@@ -43,8 +43,8 @@ def main(reach, live, const_prop, cse, file=None):
     if file is not None:
         with open(file, "r") as infile:
            prog = json.load(infile)
-
-    # prog = json.load(sys.stdin)
+    else: 
+        prog = json.load(sys.stdin)
 
     if reach:
         reverse = False

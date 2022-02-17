@@ -56,14 +56,11 @@ def main(reach, live, const_prop, cse, file=None):
         printer = Printer(reverse=True)
         merge_fn = merge_live
         transfer_fn = transfer_live
-    elif const_prop:
+    elif const_prop or cse:
         reverse = False 
         printer = None
         merge_fn = merge_lvn
         transfer_fn = transfer_lvn
-    elif cse:
-        reverse = False
-        printer = None
     else:
         raise Exception("invalid input choice argument")
 

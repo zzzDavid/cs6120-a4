@@ -195,9 +195,23 @@ def is_overwritten(dest, instrs):
             return True
     return False
 
-def lvn(block, ins=None, debug=False):
-    new_block = list()
+def const_upfront(ins : set):
+    """Set doesn't preserve order, so
+    it creates problem for lvn with upstream
+    expressions, e.g. {('sum1', 'add', 'x', 'x'), ('x', 'const', 4)}
+    To solve this issue, we need to put the const 
+    instrs up front, and convert to a list
+    """
+    res = list()
+    for instr in ins:
+        if instr[1] == "const":
+            res.insert(0, instr)
+        else:
+            res.append(instr)
+    return res
 
+def lvn(block, ins=None, debug=False, const_fold=False):
+    new_block = list()
     # env: symbol name -> local value number
     env = dict() # str -> int
     # local value numbering table
@@ -206,6 +220,9 @@ def lvn(block, ins=None, debug=False):
     tuples = list()
 
     if ins != None:
+        # put const upfront
+        ins = const_upfront(ins)
+        ins.reverse()
         # upstream constants and expressions
         for in_tuple in ins:
             in_instr = dict()
@@ -220,13 +237,13 @@ def lvn(block, ins=None, debug=False):
                 in_instr['args'] = list(in_tuple[2:])
                 in_instr['remove'] = True
             block.insert(0, in_instr)
-    
 
     for idx, instr in enumerate(block):
         old_name = None
 
         # try compute the instr for constant folding
-        instr = compute(instr, env, tuples, table)
+        if const_fold:
+            instr = compute(instr, env, tuples, table)
 
         # skip the labels
         if 'op' not in instr: continue

@@ -3,7 +3,9 @@ def print_set(s):
     if len(s) == 0:
         print("∅")
     else:
-        for i, v in enumerate(list(s)):
+        l = list(s)
+        l.sort()
+        for i, v in enumerate(l):
             if i == len(s) - 1:
                 print(v)
             else:

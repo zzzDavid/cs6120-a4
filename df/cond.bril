@@ -1,4 +1,4 @@
-# ARGS: live
+# CMD: bril2json < {filename} | python ../main.py -live
 
 @main {
   a: int = const 47;

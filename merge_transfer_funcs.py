@@ -60,7 +60,7 @@ def transfer_lvn(bb, ins):
         if 'args' in instr:
             value_tuple = (instr['dest'], instr['op'], *instr['args'])
         else: # const instr
-            value_tuple = (instr['op'], instr['value'])
+            value_tuple = (instr['dest'], instr['op'], instr['value'])
     
 
 # Live variables

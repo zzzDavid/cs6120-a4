@@ -55,5 +55,6 @@ class CFG(object):
     def gen_instrs(self):
         instrs = list()
         for label in self.labels:
+            instrs.append({'label' : label})
             instrs.extend(self.cfg[label].instrs)
         return instrs

@@ -6,6 +6,8 @@ import sys
 import json
 from basic_block import form_basic_blocks
 
+TERMINATORS = ['jmp', 'br', 'rt']
+
 def str2bool(boolean):
     if boolean:
         return 'true'
@@ -210,7 +212,7 @@ def const_upfront(ins : set):
             res.append(instr)
     return res
 
-def lvn(block, ins=None, debug=False, const_fold=False):
+def lvn(block, ins=None, const_fold=True, debug=False):
     new_block = list()
     # env: symbol name -> local value number
     env = dict() # str -> int
@@ -247,6 +249,9 @@ def lvn(block, ins=None, debug=False, const_fold=False):
 
         # skip the labels
         if 'op' not in instr: continue
+        if instr['op'] in TERMINATORS: 
+            new_block.append(instr)
+            continue
         # Build value tuple
         if 'args' in instr:
             if all(item in env for item in instr['args']):

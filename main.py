@@ -29,6 +29,8 @@ def worklist(cfg, merge_func, transfer_func, printer):
         bb_ins_merged = merge_func(bb_ins)
         ins[label] = bb_ins_merged
         bb_outs  = transfer_func(bb, bb_ins_merged)
+        # update the instructions in cfg
+        cfg[label].instrs = bb.instrs
         if len(bb_outs) != len(outs[label]):
             outs[label] = bb_outs
             for succ in bb.succ:
@@ -38,7 +40,7 @@ def worklist(cfg, merge_func, transfer_func, printer):
         printer(ins, outs)
     
 
-def main(reach, live, const_prop, cse, file=None):
+def main(reach, live, const_prop, cse, cf, file=None):
     # read from file because it's easier to debug this way
     if file is not None:
         with open(file, "r") as infile:
@@ -56,11 +58,13 @@ def main(reach, live, const_prop, cse, file=None):
         printer = Printer(reverse=True)
         merge_fn = merge_live
         transfer_fn = transfer_live
-    elif const_prop or cse:
+    elif const_prop or cse or cf:
         reverse = False 
         printer = None
         merge_fn = merge_lvn
         transfer_fn = transfer_lvn
+        if cf:
+            transfer_fn = transfer_cf
     else:
         raise Exception("invalid input choice argument")
 
@@ -72,7 +76,7 @@ def main(reach, live, const_prop, cse, file=None):
         worklist(cfg, merge_fn, transfer_fn, printer)
         func['instrs'] = control_flow_graph.gen_instrs()
     
-    if const_prop or cse: 
+    if const_prop or cse or cf: 
         print(json.dumps(prog, indent=2))
 
 if __name__ == "__main__":
@@ -89,6 +93,9 @@ if __name__ == "__main__":
     parser.add_argument('-cse', dest='cse',
                         default=False, action='store_true',
                         help='CSE')
+    parser.add_argument('-cf', dest='cf',
+                        default=False, action='store_true',
+                        help='constant folding')
     parser.add_argument('-f', dest='filename', 
                         action='store', type=str, help='json file')
     args = parser.parse_args()
@@ -96,5 +103,6 @@ if __name__ == "__main__":
     live = args.live_variable
     const_prop = args.const_prop
     cse = args.cse
+    cf = args.cf
     file = args.filename
-    main(reach, live, const_prop, cse, file)
+    main(reach, live, const_prop, cse, cf, file)

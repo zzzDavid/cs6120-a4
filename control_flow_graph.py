@@ -11,6 +11,7 @@ class CFG(object):
     Give each block succ and pred 
     """
     def __init__(self, blocks, reverse=False):
+        self.labels = list()
         self.blocks = blocks
         self.cfg = dict()
         self.reverse = reverse
@@ -26,6 +27,7 @@ class CFG(object):
             if "label" in block[0]:
                 label = block[0]['label']
             self.cfg[label] = bb
+            self.labels.append(label)
 
         # add succ and pred to the basic blocks
         for label, bb in self.cfg.items():
@@ -49,3 +51,9 @@ class CFG(object):
                     else:
                         self.cfg[label].succ.append(target)
                         self.cfg[target].pred.append(label)
+
+    def gen_instrs(self):
+        instrs = list()
+        for label in self.labels:
+            instrs.extend(self.cfg[label].instrs)
+        return instrs

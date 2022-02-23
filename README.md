@@ -32,3 +32,9 @@ All tests in `df` can be checked with `turnt ./df/*.bril`
 ```
 ❯ bril2json < df/cse-nonlocal.bril | python main.py -cf | bril2txt
 ```
+
+## Test
+Run any test in the `df` folder with turnt:
+```
+❯ turnt ./df/*.bril
+```

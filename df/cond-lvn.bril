@@ -1,0 +1,14 @@
+# CMD: bril2json < {filename} | python ../main.py -const_prop | bril2txt
+
+@main(x: int, cond: bool) {
+  br cond .then .else;
+.then:
+  z: int = add x x;
+  print z;
+  jmp .end;
+.else:
+  jmp .end;
+.end:
+  y: int = add x x;
+  print y;
+}

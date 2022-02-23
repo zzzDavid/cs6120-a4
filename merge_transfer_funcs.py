@@ -39,8 +39,10 @@ def merge_lvn(ins):
     - return: a set
     """
     res = set()
+    if len(ins) > 0:
+        res.update(ins[0])
     for i in ins:
-        res = res.union(i)
+        res = res.intersection(i)
     return res
 
 def transfer_lvn(bb, ins):

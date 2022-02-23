@@ -1,0 +1,13 @@
+@main(x: int, cond: bool) {
+.start:
+  br cond .then .else;
+.then:
+  z: int = add x x;
+  print z;
+  jmp .end;
+.else:
+  jmp .end;
+.end:
+  y: int = add x x;
+  print y;
+}
